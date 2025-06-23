@@ -3,6 +3,7 @@
 
 #include "Ray.hpp"
 #include "Interval.hpp"
+#include "Materials.hpp"
 
 class Hittable
 {
@@ -14,7 +15,8 @@ public:
 class Sphere : public Hittable
 {
 public:
-    Sphere(const Point3 &center, float radius) : m_Center(center), m_Radius(std::fmax(0, radius)) {}
+    Sphere(const Point3 &center, float radius, std::shared_ptr<Material> pMat) 
+        : m_Center(center), m_Radius(std::fmax(0, radius)), m_MatPtr(pMat) {}
 
     bool IsHit(const Ray &r, Interval interval, Payload &payload) const override
     {
@@ -42,6 +44,7 @@ public:
         payload.m_HitPoint = r.At(payload.m_Tvalue);
         Vector3 outwardNormal = (payload.m_HitPoint - m_Center) / m_Radius;
         payload.SetFrontFace(r, outwardNormal);
+        payload.m_MatPtr = m_MatPtr;
 
         return true;
     }
@@ -49,6 +52,7 @@ public:
 private:
     Point3 m_Center;
     float m_Radius;
+    std::shared_ptr<Material> m_MatPtr;
 };
 
 class HittableList : public Hittable

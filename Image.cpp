@@ -1,4 +1,5 @@
 #include "Image.hpp"
+#include "Interval.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
@@ -40,9 +41,14 @@ void Image::Download(const char *fileName)
             float g = fPixel.g();
             float b = fPixel.b();
 
-            int ir = int(255.999 * r);
-            int ig = int(255.999 * g);
-            int ib = int(255.999 * b);
+            r = LinearToGamma(r);
+            g = LinearToGamma(g);
+            b = LinearToGamma(b);
+
+            static const Interval intensity(0.000, 0.999);
+            int ir = int(256 * intensity.Clamp(r));
+            int ig = int(256 * intensity.Clamp(g));
+            int ib = int(256 * intensity.Clamp(b));
 
             pixels[index++] = ir;
             pixels[index++] = ig;

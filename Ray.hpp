@@ -17,6 +17,7 @@ private:
     Vector3 m_Direction;
 };
 
+class Material;
 class Payload
 {
 public:
@@ -24,6 +25,7 @@ public:
     Vector3 m_Normal;
     float m_Tvalue;
     bool m_IsFrontFace;
+    std::shared_ptr<Material> m_MatPtr;
 
     void SetFrontFace(const Ray &ray, const Vector3 &normal)
     {

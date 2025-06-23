@@ -1,8 +1,8 @@
 #ifndef __MANHATTAN_CORE_VECTOR3_HPP__
 #define __MANHATTAN_CORE_VECTOR3_HPP__
 
-#include "RNG.hpp"
 #include <iostream>
+#include "RNG.hpp"
 
 class Vector3
 {
@@ -54,6 +54,15 @@ public:
     {
         return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
+
+    bool IsNearZero() const {
+        auto s = 1e-8;
+        return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
+    }
+
+
+    static Vector3 Random() { return Vector3(RNG::Get1D(), RNG::Get1D(), RNG::Get1D()); }
+    static Vector3 Random(float min, float max) { return Vector3(RNG::Get1D(min, max), RNG::Get1D(min, max), RNG::Get1D(min, max)); }
 };
 
 using Vertex3 = Vector3;
@@ -111,6 +120,45 @@ inline Vector3 Normalize(const Vector3 &v)
     return v / v.Length();
 }
 
+inline Vector3 RandomUnitVector3() 
+{
+    while (true) 
+    {
+        auto p = Vector3::Random(-1, 1);
+        auto lensq = p.LengthSquared();
+        if (1e-160 < lensq && lensq <= 1)
+            return p / sqrt(lensq);
+    }
+}
 
+inline Vector3 RandomOnHemiSphere(const Vector3& normal)
+{
+    Vector3 onUnitSphere = RandomUnitVector3();
+    if (Dot(onUnitSphere, normal) > 0.0f) return onUnitSphere;
+    else return -onUnitSphere;
+}
+
+inline Vector3 RandomInUnitDisk()
+{
+    while (true)
+    {
+        auto p = Vector3(RNG::Get1D(-1, 1), RNG::Get1D(-1, 1), 0);
+        if (p.LengthSquared() < 1)
+            return p;
+    }
+}
+
+inline Vector3 Reflect(const Vector3& v, const Vector3& n)
+{
+    return v - 2 * Dot(v, n) * n;
+}
+
+inline Vector3 Refract(const Vector3& uv, const Vector3& n, float etaiOverEtai)
+{
+    auto cosTheta = std::fmin(Dot(-uv, n), 1.0f);
+    Vector3 rayOutPerp = etaiOverEtai * (uv + cosTheta * n);
+    Vector3 rayOutParallel = -std::sqrt(std::fabs(1.0 - rayOutPerp.LengthSquared())) * n;
+    return rayOutPerp + rayOutParallel;
+}
 
 #endif

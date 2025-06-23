@@ -10,7 +10,7 @@
 const float kInf = std::numeric_limits<float>::infinity();
 const float kPi = (float)3.1415926535897932385;
 
-inline float DrgreesToRadians(float degrees) {
+inline float DegreesToRadians(float degrees) {
     return degrees * kPi / 180.0f;
 }
 

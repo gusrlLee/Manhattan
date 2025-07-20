@@ -6,7 +6,8 @@ add_subdirectory(ThirdParty)
 
 find_package(SDL3 REQUIRED)
 
-add_executable(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME}
+    window.h
     main.cpp
 )
 

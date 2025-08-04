@@ -22,7 +22,16 @@ struct Ray
 {
     vec3 o;
     vec3 d;
-    float tmin;
+
+    vec3 At(float t) { return o + d * t; }
+};
+
+struct SurfaceInteraction
+{
+    float tMin;
+    vec3 pos;
+    vec3 normal;
+    int idx;
 };
 
 struct Camera
@@ -34,20 +43,21 @@ struct Camera
 
 struct Sphere
 {
-    vec3 c;
     float r;
+    vec3 c;
+    vec3 emit;
+    vec3 color;
     Material mat;
-    vec3 albedo;
 
-    bool Intersect(const Ray &ray)
+    bool Intersect(const Ray &ray, SurfaceInteraction &si)
     {
-#if 1
         vec3 oc = c - ray.o;
         float a = dot(ray.d, ray.d);
         float b = -2.0f * dot(ray.d, oc);
         float c = dot(oc, oc) - r * r;
         float det = b * b - 4 * a * c;
-        if (det < 0 ) return false; // MISS 
+        if (det < 0)
+            return false; // MISS
 
         float sqd = sqrt(det);
         float root = (-b - sqd) / (2.0f * a);
@@ -58,37 +68,8 @@ struct Sphere
                 return false;
         }
 
+        si.tMin = root;
         return true;
-#else
-        // vec3 oc = ray.o - c;
-        // float a = dot(ray.d, ray.d);
-        // float b = 2 * dot(oc, ray.d);
-        // float c = dot(oc, oc) - r * r;
-        // float det = b * b - 4 * a * c;
-        // if (det < 0) return false;
-        // else return true;
-        vec3 oc = ray.o - c;
-        float a = dot(ray.d, ray.d);
-        float half_b = dot(oc, ray.d);
-        float c = dot(oc, oc) - r * r;
-        float disc = half_b * half_b - a * c;
-        if (disc < 0)
-            return false;
-        float sqd = sqrt(disc);
-
-        // 먼저 작은 root 시도
-        float root = (-half_b - sqd) / a;
-        if (root < 0 || root > 1e30f)
-        {
-            // 못 쓰면 큰 root 사용
-            root = (-half_b + sqd) / a;
-            if (root < 0 || root > 1e30f)
-                return false;
-        }
-
-        return true;
-
-#endif
     }
 };
 

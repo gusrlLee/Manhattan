@@ -128,7 +128,7 @@ int main()
         for (int i = 0; i < w; i++)
             fprintf(f, "%d %d %d ", ToInt(img[i + j * w].r), ToInt(img[i + j * w].g), ToInt(img[i + j * w].b));
     fclose(f);
-
+    
     delete[] img;
     return 0;
 }

@@ -47,22 +47,7 @@ class PathTracer(mi.SamplingIntegrator):
         prev_si = dr.zeros(mi.SurfaceInteraction3f)
 
         while (active):
-            si: mi.SurfaceInteraction3f = scn.ray_intersect(ray)
-            ds = mi.DirectionSample3f(scn, si=si, ref=prev_si)
-            Le = thp * ds.emitter.eval(si)
-            active_next = (depth + 1 < self.max_depth) & si.is_valid()
-            bsdf: mi.BSDF = si.bsdf(wi)
-            bsdf_sample, bsdf_val = bsdf.sample(bsdf_ctx, si, sampler.next_1d(), sampler.next_2d(), active_next)
-            wi = si.spawn_ray(si.to_world(bsdf_sample.wo))
-            L = (L + Le)
-            thp *= bsdf_val
-            prev_si = dr.detach(si, True)
-            rr_prop = dr.maximum(thp.x, dr.maximum(thp.y, thp.z))
-            rr_prop[depth < self.rr_depth] = 1.
-            thp *= dr.rcp(rr_prop)
-            active_next &= (sampler.next_1d() < rr_prop)
-            active = active_next
-            depth += 1
+            
 
         return (L, (depth != 0), [])
     
